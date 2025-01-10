@@ -21,7 +21,7 @@ impl Parse for Comp {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         Ok(Self {
             mapping: input.parse()?,
-            for_if_clauses: parse_one_or_more(&input)?,
+            for_if_clauses: parse_one_or_more(input)?,
         })
     }
 }
@@ -51,7 +51,7 @@ impl ToTokens for Comp {
     }
 }
 
-fn parse_one_or_more<T: Parse>(input: &ParseStream) -> syn::Result<Vec<T>> {
+fn parse_one_or_more<T: Parse>(input: ParseStream) -> syn::Result<Vec<T>> {
     Ok(parse_more(vec![input.parse()?], input))
 }
 
@@ -81,7 +81,7 @@ impl Parse for ForIfClause {
         let pattern = input.parse()?;
         input.parse::<Token![in]>()?;
         let iter = input.parse()?;
-        let clauses = parse_zero_or_more(&input);
+        let clauses = parse_zero_or_more(input);
 
         Ok(ForIfClause {
             pattern,
@@ -91,11 +91,11 @@ impl Parse for ForIfClause {
     }
 }
 
-fn parse_zero_or_more<T: Parse>(input: &ParseStream) -> Vec<T> {
+fn parse_zero_or_more<T: Parse>(input: ParseStream) -> Vec<T> {
     parse_more(Vec::new(), input)
 }
 
-fn parse_more<T: Parse>(mut result: Vec<T>, input: &ParseStream) -> Vec<T> {
+fn parse_more<T: Parse>(mut result: Vec<T>, input: ParseStream) -> Vec<T> {
     while let Ok(v) = input.parse() {
         result.push(v)
     }
