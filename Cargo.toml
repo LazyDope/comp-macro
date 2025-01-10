@@ -1,0 +1,3 @@
+[workspace]
+members = ["comp", "comp_macro"]
+resolver = "2"
