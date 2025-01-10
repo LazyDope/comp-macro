@@ -1,4 +1,4 @@
-use proc_macro2::TokenStream;
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
     parse::{Parse, ParseStream},
@@ -27,7 +27,7 @@ impl Parse for Comp {
 }
 
 impl ToTokens for Comp {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
         let Self {
             mapping,
             for_if_clauses,
@@ -52,11 +52,7 @@ impl ToTokens for Comp {
 }
 
 fn parse_one_or_more<T: Parse>(input: &ParseStream) -> syn::Result<Vec<T>> {
-    let mut result = vec![input.parse()?];
-    while let Ok(v) = input.parse() {
-        result.push(v);
-    }
-    Ok(result)
+    Ok(parse_more(vec![input.parse()?], input))
 }
 
 struct Mapping(syn::Expr);
@@ -68,7 +64,7 @@ impl Parse for Mapping {
 }
 
 impl ToTokens for Mapping {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
         self.0.to_tokens(tokens);
     }
 }
@@ -96,7 +92,10 @@ impl Parse for ForIfClause {
 }
 
 fn parse_zero_or_more<T: Parse>(input: &ParseStream) -> Vec<T> {
-    let mut result = Vec::new();
+    parse_more(Vec::new(), input)
+}
+
+fn parse_more<T: Parse>(mut result: Vec<T>, input: &ParseStream) -> Vec<T> {
     while let Ok(v) = input.parse() {
         result.push(v)
     }
@@ -112,7 +111,7 @@ impl Parse for Pattern {
 }
 
 impl ToTokens for Pattern {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
         self.0.to_tokens(tokens);
     }
 }
@@ -127,7 +126,7 @@ impl Parse for Clause {
 }
 
 impl ToTokens for Clause {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
         self.0.to_tokens(tokens);
     }
 }
