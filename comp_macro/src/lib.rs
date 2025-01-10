@@ -72,7 +72,7 @@ impl ToTokens for Mapping {
 struct ForIfClause {
     pattern: Pattern,
     iter: syn::Expr,
-    clauses: Vec<Clause>,
+    clauses: Vec<Condition>,
 }
 
 impl Parse for ForIfClause {
@@ -116,16 +116,16 @@ impl ToTokens for Pattern {
     }
 }
 
-struct Clause(syn::Expr);
+struct Condition(syn::Expr);
 
-impl Parse for Clause {
+impl Parse for Condition {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         input.parse::<syn::Token![if]>()?;
         input.parse().map(Self)
     }
 }
 
-impl ToTokens for Clause {
+impl ToTokens for Condition {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         self.0.to_tokens(tokens);
     }
